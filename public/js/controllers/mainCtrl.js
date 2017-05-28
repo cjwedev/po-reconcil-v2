@@ -9,108 +9,52 @@ MainCtrl.$inject = ['$http', '$state', '$filter', 'Upload'];
 function MainCtrl($http, $state, $filter, Upload) {
   var ctrl = this;
 
-  ctrl.po = {};
-  ctrl.dateFormat = 'MM/dd/yyyy';
-  ctrl.dateOptions = {
+  ctrl.po = {}; // Total PO Conciliation object
+  ctrl.dateFormat = 'MM/dd/yyyy'; // Date format for Angular UI Bootstrap
+  ctrl.dateOptions = { // Date option used for date picker
     maxDate: new Date(2050, 12, 31),
     minDate: new Date(2000, 1, 1),
     startingDay: 1,
     showWeeks: false
   };
-  ctrl.altDateFormats = ['M!/d!/yyyy'];
-  ctrl.itemCategories = ['Missing', 'Cosmetic', 'Broken', 'Extra'];
+  ctrl.altDateFormats = ['M!/d!/yyyy']; // Date validation format
+  ctrl.itemCategories = ['Missing', 'Cosmetic', 'Broken', 'Extra']; // Conciliation Type
 
+  ctrl.step; // Edit step
+  ctrl.stepTitles = [
+    'Who is checking in this PO?',
+    'Enter Purchase Order Information'
+  ];
+
+  ctrl.checkers = [
+    'Mike Kobalski',
+    'Cort Ulas',
+    'Tommy Caveny',
+    'Jeremy Vestal'
+  ];
+
+  // AWS Configuration
   AWS.config.region = 'us-east-1';
   AWS.config.update({ accessKeyId: 'AKIAIIRPPBXJ5NF2VCBA', secretAccessKey: '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' });
 
-  ctrl.openReceiptDate = function() {
-    ctrl.receiptDateOpened = true;
-  }
-
-  ctrl.addItem = function() {
-    var item = new Object();
-
-    item.category = ctrl.itemCategories[0];
-    item.qty = 0;
-
-    ctrl.po.items.push(item);
-  }
-
-  ctrl.updateDifference = function() {
-    var orgPurchasePrice = parseInt(ctrl.po.orgPurchasePrice) || 0;
-    var receivedValue = orgPurchasePrice;
-    for (var i = 0; i < ctrl.po.items.length; i++) {
-      var item = ctrl.po.items[i];
-      if (item.category == 'Missing' || item.category == 'Cosmetic' || item.category == 'Broken') {
-        var poChange = parseInt(item.poChange) || 0;
-        receivedValue -= poChange;
-      } else {
-        var poChange = parseInt(item.purchasePrice) || 0;
-        receivedValue += poChange;
-      }
-    }
-
-    ctrl.po.receivedValue = receivedValue;
-    ctrl.po.difference = orgPurchasePrice - ctrl.po.receivedValue;
-  }
-
-  ctrl.done = function(form) {
-    if (!form.$valid) {
-      return;
-    }
-
-    // Upload files
-    var bucket = new AWS.S3({ params: { Bucket: 'poconciliation', maxRetries: 1 }, httpOptions: { timeout: 360000 } });
-    var options = {
-      partSize: 10 * 1024 * 1024,
-      queueSize: 1,
-      ACL: 'bucket-owner-full-control'
-    };
-
-    var filesCount = 0, uploadedCount = 0;
-    for (var i = 0; i < ctrl.po.items.length; i++) {
-      var file = ctrl.po.items[i].file;
-      if (file) {
-        filesCount ++;
-        ctrl.po.items[i].fileName = ctrl.po.poNumber + '-' + file.name;
-        var params = {
-          Bucket: 'poconciliation',
-          Key: ctrl.po.items[i].fileName,
-          ContentType: file.type, Body: file
-        };
-
-        bucket.upload(params, options, function(err, data) {
-          uploadedCount ++;
-
-          if (uploadedCount == filesCount) { // All files were uploaded
-            postParams();
-          }
-        });
-      }
-    }
-
-    if (uploadedCount == 0) {
-      postParams();
-    }
-  }
-
-  ctrl.changeCategory = function(index) {
-    var category = ctrl.po.items[index].category;
-    ctrl.po.items[index] = {category: category};
-  }
-
-  ctrl.selectFile = function(file, index) {
-    ctrl.po.items[index].file = file;
-  }
-
-  ctrl.removeItem = function(index) {
-    ctrl.po.items.splice(index, 1);
-  }
-
+  // Closing Alert
   ctrl.closeAlert = function() {
     ctrl.error = null;
   }
 
+  ctrl.goNext = function(form) {
+    if (!form.$valid) {
+      return;
+    }
+
+    ctrl.step ++;
+  }
+
+  ctrl.goPrev = function() {
+    ctrl.step --;
+  }
+
+  // Post form data to API endpoint
   function postParams() {
     $http({
       method: 'POST',
@@ -142,10 +86,7 @@ function MainCtrl($http, $state, $filter, Upload) {
   }
 
   function init() {
-    ctrl.receiptDateOpened = false;
-    ctrl.po.receivedValue = 0;
-    ctrl.po.difference = 0;
-    ctrl.po.items = [];
+    ctrl.step = 0;
   }
 
   init();
