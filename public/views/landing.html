@@ -1,0 +1,438 @@
+<div class="container main">
+
+    <!-- Alert -->
+    <div uib-alert class="alert-danger" close="ctrl.closeAlert();" ng-if="ctrl.error">{{ctrl.error}}</div>
+
+    <form name="poForm" role="form" ng-submit="ctrl.done(poForm);" novalidate>
+        <!-- Start of Header -->
+        <div class="row">
+            <div class="col-md-8">
+                <div class="po-info content-block">
+                    <h3 class="content-title">PO Info</h3>
+
+                    <div class="row">
+                        <div class="col-md-5 col-sm-12">
+                            <div class="form-horizontal">
+                                <div class="form-group">
+                                    <label for="poNumber" class="col-xs-5 control-label">PO Number</label>
+                                    <div class="col-xs-7">
+                                        <input type="text" name="poNumber" class="form-control"
+                                               ng-model="ctrl.po.poNumber"
+                                               ng-class="{'required-field': poForm.$submitted && poForm.poNumber.$error.required}"
+                                               required
+                                        />
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="receiptDate" class="col-xs-5 control-label">Receipt Date</label>
+                                    <div class="col-xs-7">
+                                        <div class="input-group">
+                                            <input type="text"
+                                                name="receiptDate"
+                                                class="form-control"
+                                                placeholder="mm/dd/yyyy"
+                                                uib-datepicker-popup="{{ctrl.dateFormat}}"
+                                                ng-model="ctrl.po.receiptDate"
+                                                datepicker-options="ctrl.dateOptions"
+                                                ng-required="true"
+                                                close-text="Close"
+                                                is-open="ctrl.receiptDateOpened"
+                                                alt-input-formats="ctrl.altDateFormats"
+                                                show-button-bar="false"
+                                                ng-class="{'required-field': poForm.$submitted && poForm.receiptDate.$error.required}"
+                                                required
+                                            />
+                                            <span class="input-group-btn">
+                                                <button type="button" class="btn btn-default" ng-click="ctrl.openReceiptDate()">
+                                                    <i class="fa fa-calendar" aria-hidden="true"></i>
+                                                </button>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-7 col-sm-12">
+                            <div class="form-horizontal">
+                                <div class="form-group">
+                                    <label for="orgPurchasePrice" class="col-md-6 col-sm-5 control-label">Original Purchase Price</label>
+                                    <div class="col-md-6 col-sm-7">
+                                        <div class="input-group">
+                                            <div class="input-group-addon">$</div>
+                                            <input type="text" name="orgPurchasePrice" class="form-control"
+                                                ng-model="ctrl.po.orgPurchasePrice"
+                                                ng-class="{'required-field': poForm.$submitted && poForm.orgPurchasePrice.$error.required}"
+                                                ng-change="ctrl.updateDifference();"
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-6 col-sm-5 control-label">Received Value</label>
+                                    <div class="col-md-6 col-sm-7">
+                                        <div class="po-value">{{ctrl.po.receivedValue | currency:"$":2}}</div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-6 col-sm-5 control-label">Difference</label>
+                                    <div class="col-md-6 col-sm-7">
+                                        <div class="po-value">{{ctrl.po.difference | currency:"$":2}}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="content-block">
+                    <h3 class="content-title text-center">Receiving Contact Info</h3>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-horizontal">
+                                <div class="form-group">
+                                    <label for="contactName" class="col-xs-5 control-label">Name</label>
+                                    <div class="col-xs-7">
+                                        <input type="text" name="contactName" class="form-control"
+                                            ng-model="ctrl.po.contactName"
+                                            ng-class="{'required-field': poForm.$submitted && poForm.contactName.$error.required}"
+                                            required
+                                        />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="contactName" class="col-xs-5 control-label">Email</label>
+                                    <div class="col-xs-7">
+                                        <input type="email" name="contactEmail" class="form-control"
+                                            ng-model="ctrl.po.contactEmail"
+                                            ng-class="{'required-field': poForm.$submitted && (poForm.contactEmail.$error.required || poForm.contactEmail.$error.email)}"
+                                            required
+                                        />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="contactPhone" class="col-xs-5 control-label">Phone Number</label>
+                                    <div class="col-xs-7">
+                                        <input type="text" name="contactPhone" class="form-control"
+                                            ng-model="ctrl.po.contactPhone"
+                                            ng-class="{'required-field': poForm.$submitted && poForm.contactPhone.$error.required}"
+                                            required
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- End of Header -->
+
+        <hr />
+
+        <!-- Start of Conciliation -->
+        <div class="row" ng-repeat="item in ctrl.po.items track by $index">
+            <div class="col-md-12">
+
+                <!-- Start of Missing -->
+                <div class="item-section" ng-if="item.category == 'Missing'">
+                    <div class="row">
+                        <div class="col-md-5 col-sm-12">
+                            <div class="item">
+                                <div class="item-category">
+                                    <select class="form-control"
+                                            ng-options="category for category in ctrl.itemCategories track by category"
+                                            ng-model="item.category"
+                                            ng-change="ctrl.changeCategory($index)">
+                                    </select>
+                                </div>
+                                <div class="item-name">
+                                    <input type="text" class="form-control"
+                                            placeholder="Product Number"
+                                            name="{{'productNumber' + $index}}"
+                                            ng-model="item.productNumber"
+                                            ng-class="{'required-field': poForm.$submitted && poForm['productNumber' + $index].$error.required}"
+                                            required
+                                    />
+                                </div>
+                                <div class="item-qty">
+                                    <span class="mr10">QTY</span>
+                                    <input type="number" class="form-control"
+                                            name="{{'qty' + $index}}"
+                                            ng-model="item.qty"
+                                            min="1"
+                                            max="9999"
+                                            ng-class="{'required-field': poForm.$submitted && (poForm['qty' + $index].$error.required || !poForm['qty' + $index].$valid)}"
+                                            required
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-7 col-sm-12">
+                            <div class="item">
+                                <div class="item-purchase-price">
+                                    <div class="input-group">
+                                        <div class="input-group-addon">$</div>
+                                        <input type="text" class="form-control" placeholder="Purchase Price"
+                                                name="{{'purchasePrice' + $index}}"
+                                                ng-model="item.purchasePrice"
+                                                ng-class="{'required-field': poForm.$submitted && poForm['purchasePrice' + $index].$error.required}"
+                                                required
+                                        />
+                                    </div>
+                                </div>
+
+                                <div class="item-po-change">
+                                    <div class="input-group">
+                                        <div class="input-group-addon">-$</div>
+                                        <input type="text" class="form-control" placeholder="Po Change"
+                                                name="{{'poChange' + $index}}"
+                                                ng-model="item.poChange"
+                                                ng-class="{'required-field': poForm.$submitted && poForm['poChange' + $index].$error.required}"
+                                                ng-change="ctrl.updateDifference();"
+                                                required
+                                        />
+                                        <div class="item-remove-action">
+                                            <a ng-click="ctrl.removeItem($index)"><i class="fa fa-times" aria-hidden="true"></i></a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- End of Missing -->
+
+                <!-- Start of Cosmetic -->
+                <div class="item-section" ng-if="item.category == 'Cosmetic' || item.category == 'Broken'">
+                    <div class="row">
+                        <div class="col-md-5 col-sm-12">
+                            <div class="item">
+                                <div class="item-category">
+                                    <select class="form-control"
+                                            ng-options="category for category in ctrl.itemCategories track by category"
+                                            ng-model="item.category"
+                                            ng-change="ctrl.changeCategory($index)">
+                                    </select>
+                                </div>
+                                <div class="item-name">
+                                    <input type="text" class="form-control"
+                                            placeholder="Product Number"
+                                            name="{{'productNumber' + $index}}"
+                                            ng-model="item.productNumber"
+                                            ng-class="{'required-field': poForm.$submitted && poForm['productNumber' + $index].$error.required}"
+                                            required
+                                    />
+                                </div>
+                                <div class="item-qty">
+                                    <span class="mr10">QTY</span>
+                                    <input type="number" class="form-control"
+                                            name="{{'qty' + $index}}"
+                                            ng-model="item.qty"
+                                            min="1"
+                                            max="9999"
+                                            ng-class="{'required-field': poForm.$submitted && (poForm['qty' + $index].$error.required || !poForm['qty' + $index].$valid)}"
+                                            required
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-7 col-sm-12">
+                            <div class="item">
+                                <div class="item-purchase-price">
+                                    <div class="input-group">
+                                        <div class="input-group-addon">$</div>
+                                        <input type="text" class="form-control" placeholder="Purchase Price"
+                                                name="{{'purchasePrice' + $index}}"
+                                                ng-model="item.purchasePrice"
+                                                ng-class="{'required-field': poForm.$submitted && poForm['purchasePrice' + $index].$error.required}"
+                                                required
+                                        />
+                                    </div>
+                                </div>
+
+                                <div class="item-po-change">
+                                    <div class="input-group">
+                                        <div class="input-group-addon">-$</div>
+                                        <input type="text" class="form-control" placeholder="Po Change"
+                                                name="{{'poChange' + $index}}"
+                                                ng-model="item.poChange"
+                                                ng-class="{'required-field': poForm.$submitted && poForm['poChange' + $index].$error.required}"
+                                                ng-change="ctrl.updateDifference();"
+                                                required
+                                        />
+                                        <div class="item-remove-action">
+                                            <a ng-click="ctrl.removeItem($index)"><i class="fa fa-times" aria-hidden="true"></i></a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-5 col-sm-12">
+                            <div class="item">
+                                <div class="item-category"></div>
+                                <div class="item-name">
+                                    <button type="button" class="btn btn-default btn-success" ngf-select="ctrl.selectFile($file, $index)" accept="image/*">
+                                        <i class="fa fa-picture-o" aria-hidden="true"></i> Upload Image
+                                    </button>
+                                    {{ item.file.name }} {{ item.file.$error }} {{ item.file.$errorParam }}
+                                </div>
+                                <div class="item-qty"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-7 col-sm-12">
+                            <div class="item">
+                                <div class="item-purchase-price">
+                                    <div class="input-group">
+                                        <div class="input-group-addon">$</div>
+                                        <input type="text" class="form-control" placeholder="Cosmetic Price"
+                                                name="{{'cosmeticPrice' + $index}}"
+                                                ng-model="item.cosmeticPrice"
+                                                ng-class="{'required-field': poForm.$submitted && poForm['cosmeticPrice' + $index].$error.required}"
+                                                required
+                                        />
+                                    </div>
+                                </div>
+                                <div class="item-po-change"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-7 col-md-offset-5 col-sm-12">
+                            <textarea rows="4" class="form-control" placeholder="Comments" ng-model="item.comment"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <!-- End of Cosmetic -->
+
+                <!-- Start of Extra -->
+                <div class="item-section" ng-if="item.category == 'Extra'">
+                    <div class="row">
+                        <div class="col-md-5 col-sm-12">
+                            <div class="item">
+                                <div class="item-category">
+                                    <select class="form-control"
+                                            ng-options="category for category in ctrl.itemCategories track by category"
+                                            ng-model="item.category"
+                                            ng-change="ctrl.changeCategory($index)">
+                                    </select>
+                                </div>
+                                <div class="item-name">
+                                    <input type="text" class="form-control"
+                                            placeholder="Product Number"
+                                            name="{{'productNumber' + $index}}"
+                                            ng-model="item.productNumber"
+                                            ng-class="{'required-field': poForm.$submitted && poForm['productNumber' + $index].$error.required}"
+                                            required
+                                    />
+                                </div>
+                                <div class="item-extra-qty">
+                                    <div>Original QTY</div>
+                                    <input type="number" class="form-control"
+                                            name="{{'originalQty' + $index}}"
+                                            ng-model="item.originalQty"
+                                            min="1"
+                                            max="9999"
+                                            ng-class="{'required-field': poForm.$submitted && (poForm['originalQty' + $index].$error.required || !poForm['originalQty' + $index].$valid)}"
+                                            required
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-7 col-sm-12">
+                            <div class="item">
+                                <div class="item-extra-qty">
+                                    <div>Received QTY</div>
+                                    <input type="number" class="form-control"
+                                            name="{{'receivedQty' + $index}}"
+                                            ng-model="item.receivedQty"
+                                            min="1"
+                                            max="9999"
+                                            ng-class="{'required-field': poForm.$submitted && (poForm['receivedQty' + $index].$error.required || !poForm['receivedQty' + $index].$valid)}"
+                                            required
+                                    />
+                                </div>
+
+                                <div class="item-extra-qty">
+                                    <div>Quantity Change</div>
+                                    <div style="line-height: 35px">{{ item.receivedQty - item.originalQty }}</div>
+                                </div>
+
+                                <div class="item-purchase-price">
+                                    <div class="input-group">
+                                        <div class="input-group-addon">-$</div>
+                                        <input type="text" class="form-control" placeholder="Purchase Price"
+                                                name="{{'purchasePrice' + $index}}"
+                                                ng-model="item.purchasePrice"
+                                                ng-class="{'required-field': poForm.$submitted && poForm['purchasePrice' + $index].$error.required}"
+                                                ng-change="ctrl.updateDifference();"
+                                                required
+                                        />
+                                        <div class="item-remove-action">
+                                            <a ng-click="ctrl.removeItem($index)"><i class="fa fa-times" aria-hidden="true"></i></a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-5 col-sm-12">
+                            <div class="item">
+                                <div class="item-category"></div>
+                                <div class="item-name">
+                                    <button class="btn btn-default btn-success" ngf-select="ctrl.selectFile($file, $index)" accept="image/*">
+                                        <i class="fa fa-picture-o" aria-hidden="true"></i> Upload Image
+                                    </button>
+                                    {{ item.file.name }}
+                                </div>
+                                <div class="item-qty"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- End of Extra -->
+
+                <hr />
+            </div>
+        </div>
+        <!-- End of Conciliation -->
+
+        <!-- Start of Actions -->
+        <div>
+            <div class="mb20">
+                <button type="button" class="btn btn-primary mb20" ng-click="ctrl.addItem();">
+                    <i class="fa fa-plus-square-o" aria-hidden="true"></i> Add Item
+                </button>
+            </div>
+            <div>
+                <div class="form-group">
+                    <input type="text" class="form-control" style="width: 250px" placeholder="Email to"
+                            name="emailTo"
+                            ng-model="ctrl.po.emailTo"
+                            ng-class="{'required-field': poForm.$submitted && (poForm.emailTo.$error.required || poForm.emailTo.$error.email)}"
+                            required
+                    />
+                </div>
+                <button class="btn btn-primary">
+                    <i class="fa fa-check" aria-hidden="true"></i> Done
+                </button>
+            </div>
+        </div>
+        <!-- End of Actions -->
+    </form>
+
+</div>

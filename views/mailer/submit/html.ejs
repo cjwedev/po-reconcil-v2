@@ -1,0 +1,119 @@
+
+<div style="margin-top: 50px; width: 100%">
+    <div style="width: 100%">
+        <div style="float: left; width: 40%">
+            <h3 style="margin-bottom: 30px;">PO Info</h3>
+            <div>
+                <p style="color: #222">PO Number: <span style="margin-left: 10px; font-weight: bold;"><%= data.poNumber %></span></p>
+                <p style="color: #222">Receipt Date: <span style="margin-left: 10px; font-weight: bold;"><%= data.receiptDate %></span></p>
+                <p style="color: #222">Original Purchase Price: <span style="margin-left: 10px; font-weight: bold;"><%= data.orgPurchasePrice %></span></p>
+                <p style="color: #222">Received Value: <span style="margin-left: 10px; font-weight: bold;"><%= data.receivedValue %></span></p>
+                <p style="color: #222">Difference: <span style="margin-left: 10px; font-weight: bold;"><%= data.difference %></span></p>
+            </div>
+        </div>
+        <div style="float: left; width: 60%">
+            <h3 style="margin-bottom: 30px;">Receiving Contact Info</h3>
+            <div>
+                <p style="color: #222">Name: <span style="margin-left: 10px; font-weight: bold;"><%= data.name %></span></p>
+                <p style="color: #222">Email: <span style="margin-left: 10px; font-weight: bold;"><%= data.email %></span></p>
+                <p style="color: #222">Phone Number: <span style="margin-left: 10px; font-weight: bold;"><%= data.phoneNumber %></span></p>
+            </div>
+        </div>
+        <div style="clear: both"></div>
+    </div>
+
+    <hr />
+
+    <% for(var i = 0; i < data.items.length; i ++) { %>
+        <div style="width: 100%;">
+            <div style="width: 100%;">
+                <% if (data.items[i].category == 'Missing') { %>
+                    <h3 style="margin-bottom: 20px">Missing Equipment</h3>
+                    <div class="item-details">
+                        <div style="display: table-cell; vertical-align: top; min-width: 100px; padding-right: 20px;">
+                            <p><b>Product Number</b></p>
+                            <p><%= data.items[i].productNumber %></p>
+                        </div>
+                        <div style="display: table-cell; vertical-align: top; min-width: 100px; padding-right: 20px;">
+                            <p><b>Quantity</b></p>
+                            <p><%= data.items[i].qty %></p>
+                        </div>
+                        <div style="display: table-cell; vertical-align: top; min-width: 100px; padding-right: 20px;">
+                            <p><b>Purchase Price</b></p>
+                            <p><%= data.items[i].purchasePrice %></p>
+                        </div>
+                        <div style="display: table-cell; vertical-align: top; min-width: 100px; padding-right: 20px;">
+                            <p><b>PO Change</b></p>
+                            <p><%= data.items[i].poChange %></p>
+                        </div>
+                    </div>
+                <% } else if (data.items[i].category == 'Cosmetic' || data.items[i].category == 'Broken') { %>
+                    <h3 style="margin-bottom: 20px">Cosmetic Equipment</h3>
+                    <div class="item-details">
+                        <% if (data.items[i].fileName) { %>
+                            <div style="display: table-cell; vertical-align: top; min-width: 100px; padding-right: 20px;">
+                                <img style="max-width: 200px; margin-bottom: 20px;" src="<%= 'https://s3.amazonaws.com/poconciliation/' + data.items[i].fileName %>" />
+                            </div>
+                        <% } %>
+                        <div style="display: table-cell; vertical-align: top; min-width: 100px; padding-right: 20px;">
+                            <p><b>Product Number</b></p>
+                            <p><%= data.items[i].productNumber %></p>
+                        </div>
+                        <div style="display: table-cell; vertical-align: top; min-width: 100px; padding-right: 20px;">
+                            <p><b>Quantity</b></p>
+                            <p><%= data.items[i].qty %></p>
+                        </div>
+                        <div style="display: table-cell; vertical-align: top; min-width: 100px; padding-right: 20px;">
+                            <p><b>Purchase Price</b></p>
+                            <p><%= data.items[i].purchasePrice %></p>
+                        </div>
+                        <div style="display: table-cell; vertical-align: top; min-width: 100px; padding-right: 20px;">
+                            <p><b>Cosmetic Price</b></p>
+                            <p><%= data.items[i].cosmeticPrice %></p>
+                        </div>
+                        <div style="display: table-cell; vertical-align: top; min-width: 100px; padding-right: 20px;">
+                            <p><b>PO Change</b></p>
+                            <p><%= data.items[i].poChange %></p>
+                        </div>
+                    </div>
+                    <div class="item-details">
+                        <div style="display: table-cell; vertical-align: top; min-width: 100px; padding-right: 20px;">
+                            <p><b>Comments</b></p>
+                            <p><%= data.items[i].comment %></p>
+                        </div>
+                    </div>
+                <% } else if (data.items[i].category == 'Extra') { %>
+                    <h3 style="margin-bottom: 20px">Extra Equipment</h3>
+                    <div class="item-details">
+                        <% if (data.items[i].fileName) { %>
+                            <div style="display: table-cell; vertical-align: top; min-width: 100px; padding-right: 20px;">
+                                <img style="max-width: 200px; padding-right: 20px; margin-bottom: 20px;" src="<%= 'https://s3.amazonaws.com/poconciliation/' + data.items[i].fileName %>" />
+                            </div>
+                        <% } %>
+                        <div style="display: table-cell; vertical-align: top; min-width: 100px; padding-right: 20px;">
+                            <p><b>Product Number</b></p>
+                            <p><%= data.items[i].productNumber %></p>
+                        </div>
+                        <div style="display: table-cell; vertical-align: top; min-width: 100px; padding-right: 20px;">
+                            <p><b>Original Quantity</b></p>
+                            <p><%= data.items[i].originalQty %></p>
+                        </div>
+                        <div style="display: table-cell; vertical-align: top; min-width: 100px; padding-right: 20px;">
+                            <p><b>Quantity Received</b></p>
+                            <p><%= data.items[i].receivedQty %></p>
+                        </div>
+                        <div style="display: table-cell; vertical-align: top; min-width: 100px; padding-right: 20px;">
+                            <p><b>Quantity Change</b></p>
+                            <p><%= data.items[i].receivedQty - data.items[i].originalQty %></p>
+                        </div>
+                        <div style="display: table-cell; vertical-align: top; min-width: 100px; padding-right: 20px;">
+                            <p><b>Purchase Price</b></p>
+                            <p><%= data.items[i].purchasePrice %></p>
+                        </div>
+                    </div>
+                <% } %>
+                <hr />
+            </div>
+        </div>
+    <% } %>
+</dv>
