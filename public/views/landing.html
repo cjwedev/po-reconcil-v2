@@ -16,10 +16,10 @@
                 <div class="col-md-12" ng-if="ctrl.step == 0">
                     <form name="checkerForm" role="form" ng-submit="ctrl.goNext(checkerForm);" novalidate>
                         <p class="question">Who is checking in this PO?</p>
-                        <div class="radio" ng-repeat="checker in ctrl.checkers">
+                        <div class="radio" ng-repeat="checker in ctrl.checkers track by checker.name">
                           <label>
                             <input type="radio" name="checker" ng-value="checker" ng-model="ctrl.po.checker" required />
-                            {{checker}}
+                            {{checker.name}}
                           </label>
                         </div>
                         <div class="action-section">
@@ -104,6 +104,37 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="accountName" class="col-xs-4 control-label">Receipt Date</label>
+                                        <div class="col-xs-8">
+                                            <div class="input-group">
+                                                <input type="text"
+                                                    name="receiptDate"
+                                                    class="form-control"
+                                                    placeholder="mm/dd/yyyy"
+                                                    uib-datepicker-popup="{{ctrl.dateFormat}}"
+                                                    ng-model="ctrl.po.receiptDate"
+                                                    datepicker-options="ctrl.dateOptions"
+                                                    ng-required="true"
+                                                    close-text="Close"
+                                                    is-open="ctrl.receiptDateOpened"
+                                                    alt-input-formats="ctrl.altDateFormats"
+                                                    show-button-bar="false"
+                                                    ng-class="{'required-field': poForm.$submitted && poForm.receiptDate.$error.required}"
+                                                    required
+                                                />
+                                                <span class="input-group-btn">
+                                                    <button type="button" class="btn btn-default" ng-click="ctrl.openReceiptDate()">
+                                                        <i class="fa fa-calendar" aria-hidden="true"></i>
+                                                    </button>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="action-section">
@@ -113,6 +144,650 @@
                     </form>
                 </div>
                 <!-- End of Step 2 -->
+
+                <!-- Begin of Step 3 -->
+                <div class="col-md-12" ng-if="ctrl.step == 2">
+                    <form name="poForm" role="form" ng-submit="ctrl.goNext(poForm);" novalidate>
+                        <p class="question">Were there any Cosmetic Items on the PO?</p>
+                        <div class="radio">
+                            <label>
+                                <input type="radio" name="hasCosmetic" value="yes" ng-model="ctrl.hasCosmetic" ng-change="ctrl.changeHasCosmetic()" required />
+                                Yes
+                            </label>
+                        </div>
+                        <div class="radio">
+                            <label>
+                                <input type="radio" name="hasCosmetic" value="no" ng-model="ctrl.hasCosmetic" ng-change="ctrl.changeHasCosmetic()" required />
+                                No
+                            </label>
+                        </div>
+
+                        <div ng-repeat="item in ctrl.po.cosmetics track by $index" ng-if="ctrl.hasCosmetic">
+                            <div class="form-group">
+                                <label>Product Number</label>
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    name="{{'productNumber' + $index}}"
+                                    ng-model="item.productNumber"
+                                    ng-class="{'required-field': poForm.$submitted && poForm['productNumber' + $index].$error.required}"
+                                    required
+                                />
+                            </div>
+
+                            <div class="form-group">
+                                <label>Quantity</label>
+                                <input
+                                    type="number"
+                                    class="form-control"
+                                    name="{{'qty' + $index}}"
+                                    ng-model="item.qty"
+                                    min="1"
+                                    ng-class="{'required-field': poForm.$submitted && (poForm['qty' + $index].$error.required || !poForm['qty' + $index].$valid)}"
+                                    required
+                                />
+                            </div>
+
+                            <div class="form-group">
+                                <label>Original Purchase Amount</label>
+                                <input
+                                    type="number"
+                                    class="form-control"
+                                    name="{{'originalAmount' + $index}}"
+                                    ng-model="item.originalAmount"
+                                    ng-class="{'required-field': poForm.$submitted && (poForm['originalAmount' + $index].$error.required || !poForm['originalAmount' + $index].$valid)}"
+                                    required
+                                />
+                            </div>
+
+                            <div class="form-group">
+                                <label>Cosmetic Purchase Amount</label>
+                                <input
+                                    type="number"
+                                    class="form-control"
+                                    name="{{'cosmeticAmount' + $index}}"
+                                    ng-model="item.cosmeticAmount"
+                                    ng-class="{'required-field': poForm.$submitted && (poForm['cosmeticAmount' + $index].$error.required || !poForm['cosmeticAmount' + $index].$valid)}"
+                                    required
+                                />
+                            </div>
+
+                            <div class="form-group">
+                                <label>How does this affect your Purchase Order? </label>
+                                <input
+                                    type="number"
+                                    class="form-control"
+                                    name="{{'affectAmount' + $index}}"
+                                    ng-model="item.affectAmount"
+                                    ng-class="{'required-field': poForm.$submitted && (poForm['affectAmount' + $index].$error.required || !poForm['affectAmount' + $index].$valid)}"
+                                    required
+                                />
+                            </div>
+
+                            <div class="form-group">
+                                <label>New Purchase Amount</label>
+                                <input
+                                    type="number"
+                                    class="form-control"
+                                    name="{{'newAmount' + $index}}"
+                                    ng-model="item.newAmount"
+                                    ng-class="{'required-field': poForm.$submitted && (poForm['newAmount' + $index].$error.required || !poForm['newAmount' + $index].$valid)}"
+                                    required
+                                />
+                            </div>
+
+                            <div class="form-group">
+                                <label>Upload Cosmetic Image</label>
+                                <input type="file" class="form-control  " ngf-select ng-model="item.file" name="file" accept="image/*" />
+                            </div>
+
+                            <div class="form-group">
+                                <label>Why was this item considered Cosmetic?</label>
+                                <textarea rows="5" class="form-control" ng-model="item.comment"></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Add more Cosmetic Items</label>
+                                <div class="radio">
+                                    <label>
+                                        <input type="radio" name="{{'moreCosmetic' + $index}}" value="yes" ng-model="item.moreCosmetic" ng-change="ctrl.addCosmetic($index, item)" required />
+                                        Yes
+                                    </label>
+                                </div>
+                                <div class="radio">
+                                    <label>
+                                        <input type="radio" name="{{'moreCosmetic' + $index}}" value="no" ng-model="item.moreCosmetic" ng-change="ctrl.addCosmetic($index, item)" required />
+                                        No
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="action-section">
+                            <button type="button" class="btn btn-primary btn-prev" ng-click="ctrl.goPrev();">Previous</button>
+                            <button class="btn btn-primary btn-next">Next</button>
+                        </div>
+                    </form>
+                </div>
+                <!-- End of Step 3 -->
+
+                <!-- Begin of Step 4 -->
+                <div class="col-md-12" ng-if="ctrl.step == 3">
+                    <form name="poForm" role="form" ng-submit="ctrl.goNext(poForm);" novalidate>
+                        <p class="question">Were there any Broken Items on the PO?</p>
+                        <div class="radio">
+                            <label>
+                                <input type="radio" name="hasBroken" value="yes" ng-model="ctrl.hasBroken" ng-change="ctrl.changeHasBroken()" required />
+                                Yes
+                            </label>
+                        </div>
+                        <div class="radio">
+                            <label>
+                                <input type="radio" name="hasBroken" value="no" ng-model="ctrl.hasBroken" ng-change="ctrl.changeHasBroken()" required />
+                                No
+                            </label>
+                        </div>
+
+                        <div ng-repeat="item in ctrl.po.brokens track by $index" ng-if="ctrl.hasBroken">
+                            <div class="form-group">
+                                <label>Product Number</label>
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    name="{{'productNumber' + $index}}"
+                                    ng-model="item.productNumber"
+                                    ng-class="{'required-field': poForm.$submitted && poForm['productNumber' + $index].$error.required}"
+                                    required
+                                />
+                            </div>
+
+                            <div class="form-group">
+                                <label>Quantity</label>
+                                <input
+                                    type="number"
+                                    class="form-control"
+                                    name="{{'qty' + $index}}"
+                                    ng-model="item.qty"
+                                    min="1"
+                                    ng-class="{'required-field': poForm.$submitted && (poForm['qty' + $index].$error.required || !poForm['qty' + $index].$valid)}"
+                                    required
+                                />
+                            </div>
+
+                            <div class="form-group">
+                                <label>Original Purchase Amount</label>
+                                <input
+                                    type="number"
+                                    class="form-control"
+                                    name="{{'originalAmount' + $index}}"
+                                    ng-model="item.originalAmount"
+                                    ng-class="{'required-field': poForm.$submitted && (poForm['originalAmount' + $index].$error.required || !poForm['originalAmount' + $index].$valid)}"
+                                    required
+                                />
+                            </div>
+
+                            <div class="form-group">
+                                <label>Broken Purchase Amount</label>
+                                <input
+                                    type="number"
+                                    class="form-control"
+                                    name="{{'brokenAmount' + $index}}"
+                                    ng-model="item.brokenAmount"
+                                    ng-class="{'required-field': poForm.$submitted && (poForm['brokenAmount' + $index].$error.required || !poForm['brokenAmount' + $index].$valid)}"
+                                    required
+                                />
+                            </div>
+
+                            <div class="form-group">
+                                <label>How does this affect your Purchase Order? </label>
+                                <input
+                                    type="number"
+                                    class="form-control"
+                                    name="{{'affectAmount' + $index}}"
+                                    ng-model="item.affectAmount"
+                                    ng-class="{'required-field': poForm.$submitted && (poForm['affectAmount' + $index].$error.required || !poForm['affectAmount' + $index].$valid)}"
+                                    required
+                                />
+                            </div>
+
+                            <div class="form-group">
+                                <label>New Purchase Amount</label>
+                                <input
+                                    type="number"
+                                    class="form-control"
+                                    name="{{'newAmount' + $index}}"
+                                    ng-model="item.newAmount"
+                                    ng-class="{'required-field': poForm.$submitted && (poForm['newAmount' + $index].$error.required || !poForm['newAmount' + $index].$valid)}"
+                                    required
+                                />
+                            </div>
+
+                            <div class="form-group">
+                                <label>Upload Broken Image</label>
+                                <input type="file" class="form-control  " ngf-select ng-model="item.file" name="file" accept="image/*" />
+                            </div>
+
+                            <div class="form-group">
+                                <label>Why was this item considered Broken? </label>
+                                <textarea rows="5" class="form-control" ng-model="item.comment"></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Add more Broken Items</label>
+                                <div class="radio">
+                                    <label>
+                                        <input type="radio" name="{{'moreBroken' + $index}}" value="yes" ng-model="item.moreBroken" ng-change="ctrl.addBroken($index, item)" required />
+                                        Yes
+                                    </label>
+                                </div>
+                                <div class="radio">
+                                    <label>
+                                        <input type="radio" name="{{'moreBroken' + $index}}" value="no" ng-model="item.moreBroken" ng-change="ctrl.addBroken($index, item)" required />
+                                        No
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="action-section">
+                            <button type="button" class="btn btn-primary btn-prev" ng-click="ctrl.goPrev();">Previous</button>
+                            <button class="btn btn-primary btn-next">Next</button>
+                        </div>
+                    </form>
+                </div>
+                <!-- End of Step 4 -->
+
+                <!-- Begin of Step 5 -->
+                <div class="col-md-12" ng-if="ctrl.step == 4">
+                    <form name="poForm" role="form" ng-submit="ctrl.goNext(poForm);" novalidate>
+                        <p class="question">Were there any missing items on the PO?</p>
+                        <div class="radio">
+                            <label>
+                                <input type="radio" name="hasMissing" value="yes" ng-model="ctrl.hasMissing" ng-change="ctrl.changeHasMissing()" required />
+                                Yes
+                            </label>
+                        </div>
+                        <div class="radio">
+                            <label>
+                                <input type="radio" name="hasMissing" value="no" ng-model="ctrl.hasMissing" ng-change="ctrl.changeHasMissing()" required />
+                                No
+                            </label>
+                        </div>
+
+                        <div ng-repeat="item in ctrl.po.missings track by $index" ng-if="ctrl.hasMissing">
+                            <div class="form-group">
+                                <label>Product Number</label>
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    name="{{'productNumber' + $index}}"
+                                    ng-model="item.productNumber"
+                                    ng-class="{'required-field': poForm.$submitted && poForm['productNumber' + $index].$error.required}"
+                                    required
+                                />
+                            </div>
+
+                            <div class="form-group">
+                                <label>Quantity</label>
+                                <input
+                                    type="number"
+                                    class="form-control"
+                                    name="{{'qty' + $index}}"
+                                    ng-model="item.qty"
+                                    min="1"
+                                    ng-class="{'required-field': poForm.$submitted && (poForm['qty' + $index].$error.required || !poForm['qty' + $index].$valid)}"
+                                    required
+                                />
+                            </div>
+
+                            <div class="form-group">
+                                <label>Original Purchase Amount</label>
+                                <input
+                                    type="number"
+                                    class="form-control"
+                                    name="{{'originalAmount' + $index}}"
+                                    ng-model="item.originalAmount"
+                                    ng-class="{'required-field': poForm.$submitted && (poForm['originalAmount' + $index].$error.required || !poForm['originalAmount' + $index].$valid)}"
+                                    required
+                                />
+                            </div>
+
+                            <div class="form-group">
+                                <label>Missing Purchase Amount</label>
+                                <input
+                                    type="number"
+                                    class="form-control"
+                                    name="{{'missingAmount' + $index}}"
+                                    ng-model="item.missingAmount"
+                                    ng-class="{'required-field': poForm.$submitted && (poForm['missingAmount' + $index].$error.required || !poForm['missingAmount' + $index].$valid)}"
+                                    required
+                                />
+                            </div>
+
+                            <div class="form-group">
+                                <label>How does this affect your Purchase Order? </label>
+                                <input
+                                    type="number"
+                                    class="form-control"
+                                    name="{{'affectAmount' + $index}}"
+                                    ng-model="item.affectAmount"
+                                    ng-class="{'required-field': poForm.$submitted && (poForm['affectAmount' + $index].$error.required || !poForm['affectAmount' + $index].$valid)}"
+                                    required
+                                />
+                            </div>
+
+                            <div class="form-group">
+                                <label>Add more Missing Items</label>
+                                <div class="radio">
+                                    <label>
+                                        <input type="radio" name="{{'moreMissing' + $index}}" value="yes" ng-model="item.moreMissing" ng-change="ctrl.addMissing($index, item)" required />
+                                        Yes
+                                    </label>
+                                </div>
+                                <div class="radio">
+                                    <label>
+                                        <input type="radio" name="{{'moreMissing' + $index}}" value="no" ng-model="item.moreMissing" ng-change="ctrl.addMissing($index, item)" required />
+                                        No
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="action-section">
+                            <button type="button" class="btn btn-primary btn-prev" ng-click="ctrl.goPrev();">Previous</button>
+                            <button class="btn btn-primary btn-next">Next</button>
+                        </div>
+                    </form>
+                </div>
+                <!-- End of Step 5 -->
+
+                <!-- Begin of Step 6 -->
+                <div class="col-md-12" ng-if="ctrl.step == 5">
+                    <form name="poForm" role="form" ng-submit="ctrl.goNext(poForm);" novalidate>
+                        <p class="question">Were there any extra items on the PO?</p>
+                        <div class="radio">
+                            <label>
+                                <input type="radio" name="hasExtra" value="yes" ng-model="ctrl.hasExtra" ng-change="ctrl.changeHasExtra()" required />
+                                Yes
+                            </label>
+                        </div>
+                        <div class="radio">
+                            <label>
+                                <input type="radio" name="hasExtra" value="no" ng-model="ctrl.hasExtra" ng-change="ctrl.changeHasExtra()" required />
+                                No
+                            </label>
+                        </div>
+
+                        <div ng-repeat="item in ctrl.po.extras track by $index" ng-if="ctrl.hasExtra">
+                            <div class="form-group">
+                                <label>Product Number</label>
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    name="{{'productNumber' + $index}}"
+                                    ng-model="item.productNumber"
+                                    ng-class="{'required-field': poForm.$submitted && poForm['productNumber' + $index].$error.required}"
+                                    required
+                                />
+                            </div>
+
+                            <div class="form-group">
+                                <label>Original Quantity</label>
+                                <input
+                                    type="number"
+                                    class="form-control"
+                                    name="{{'originalQty' + $index}}"
+                                    ng-model="item.originalQty"
+                                    min="1"
+                                    ng-class="{'required-field': poForm.$submitted && (poForm['originalQty' + $index].$error.required || !poForm['originalQty' + $index].$valid)}"
+                                    required
+                                />
+                            </div>
+
+                            <div class="form-group">
+                                <label>Received Quantity</label>
+                                <input
+                                    type="number"
+                                    class="form-control"
+                                    name="{{'receivedQty' + $index}}"
+                                    ng-model="item.receivedQty"
+                                    min="1"
+                                    ng-class="{'required-field': poForm.$submitted && (poForm['receivedQty' + $index].$error.required || !poForm['receivedQty' + $index].$valid)}"
+                                    required
+                                />
+                            </div>
+
+                            <div class="form-group">
+                                <label>How does this affect your Purchase Order? </label>
+                                <input
+                                    type="number"
+                                    class="form-control"
+                                    name="{{'affectAmount' + $index}}"
+                                    ng-model="item.affectAmount"
+                                    ng-class="{'required-field': poForm.$submitted && (poForm['affectAmount' + $index].$error.required || !poForm['affectAmount' + $index].$valid)}"
+                                    required
+                                />
+                            </div>
+
+                            <div class="form-group">
+                                <label>Add more Missing Items</label>
+                                <div class="radio">
+                                    <label>
+                                        <input type="radio" name="{{'moreExtra' + $index}}" value="yes" ng-model="item.moreExtra" ng-change="ctrl.addExtra($index, item)" required />
+                                        Yes
+                                    </label>
+                                </div>
+                                <div class="radio">
+                                    <label>
+                                        <input type="radio" name="{{'moreExtra' + $index}}" value="no" ng-model="item.moreExtra" ng-change="ctrl.addExtra($index, item)" required />
+                                        No
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="action-section">
+                            <button type="button" class="btn btn-primary btn-prev" ng-click="ctrl.goPrev();">Previous</button>
+                            <button class="btn btn-primary btn-next">Next</button>
+                        </div>
+                    </form>
+                </div>
+                <!-- End of Step 6 -->
+
+                <!-- Begin of Step 7 -->
+                <div class="col-md-12" ng-if="ctrl.step == 6">
+                    <form name="poForm" role="form" ng-submit="ctrl.submit(poForm);" novalidate>
+                        <div class="row summary-info mb20">
+                            <div class="col-md-6">
+                                <img class="logo" src="../images/character.png" />
+                                <p class="po-number">PO Number: {{ctrl.po.poNumber}}</p>
+                                <div>
+                                    <p><b>Receipt Date: </b>{{ctrl.po.receiptDate | date}}</p>
+                                    <p><b>Account Name: </b>{{ctrl.po.accountName}}</p>
+                                    <p><b>Contact Name: </b>{{ctrl.po.contactName}}</p>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="checker-section">
+                                    <p><b>Checked In By:</b></p>
+                                    <div>
+                                        <img class="checker-photo" src="../images/character.png" />
+                                        <div class="checker-info">
+                                            {{ctrl.po.checker.name}} <br />
+                                            <a href="mailto:{{ctrl.po.checker.email}}">{{ctrl.po.checker.email}}</a> <br />
+                                            {{ctrl.po.checker.phone}} <br />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="original-amount">
+                                    Original PO Amount: {{ctrl.po.poAmount | currency:"$":2}}
+                                </div>
+                                <div class="new-amount">
+                                    New PO Amount: {{ctrl.po.newAmount | currency:"$":2}}
+                                </div>
+                            </div>
+                        </div>
+
+                        <p class="difference">Difference: {{ctrl.po.difference | currency:"$":2}}</p>
+
+                        <div class="mb20" ng-if="ctrl.po.cosmetics.length > 0">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="category-info">Cosmetic Equipment ({{ctrl.po.cosmetics.length}} items)</div>
+                                </div>
+
+                                <div ng-repeat="item in ctrl.po.cosmetics track by $index">
+                                    <div class="col-md-12">
+                                        <div class="item-info">
+                                            <div class="item-index"><div>{{$index + 1}}</div></div>
+                                            <div class="item-summary">
+                                                <img class="item-image" src="../images/character.png" />
+                                                <p><b>{{item.productNumber}}</b></p>
+                                                <p>
+                                                    <b>Comments:</b><br />
+                                                    <i>{{item.comment}}</i>
+                                                </p>
+                                            </div>
+                                            <div class="item-details">
+                                                <p><b>Quantity: </b>{{item.qty}}</p>
+                                                <p><b>Original Purchase Amount: </b>{{item.originalAmount | currency:"$":2}}</p>
+                                                <p><b>Cosmetic Purchase Amount: </b>{{item.cosmeticAmount | currency:"$":2}}</p>
+                                                <div class="adjust">
+                                                    <b>Purchase Order Adjustment: </b>
+                                                    <span class="value">{{item.affectAmount | currency:"$":2}}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <hr ng-if="$index != ctrl.po.cosmetics.length -1" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb20" ng-if="ctrl.po.brokens.length > 0">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="category-info">
+                                        Broken Equipment ({{ctrl.po.brokens.length}} items)
+                                    </div>
+                                </div>
+
+                                <div ng-repeat="item in ctrl.po.brokens track by $index">
+                                    <div class="col-md-12">
+                                        <div class="item-info">
+                                            <div class="item-index"><div>{{$index + 1}}</div></div>
+                                            <div class="item-summary">
+                                                <img class="item-image" src="../images/character.png" />
+                                                <p><b>{{item.productNumber}}</b></p>
+                                                <p>
+                                                    <b>Comments:</b><br />
+                                                    <i>{{item.comment}}</i>
+                                                </p>
+                                            </div>
+                                            <div class="item-details">
+                                                <p><b>Quantity: </b>{{item.qty}}</p>
+                                                <p><b>Original Purchase Amount: </b>{{item.originalAmount | currency:"$":2}}</p>
+                                                <p><b>Cosmetic Purchase Amount: </b>{{item.brokenAmount | currency:"$":2}}</p>
+                                                <div class="adjust">
+                                                    <b>Purchase Order Adjustment: </b>
+                                                    <span class="value">{{item.affectAmount | currency:"$":2}}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <hr ng-if="$index != ctrl.po.brokens.length -1" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb20" ng-if="ctrl.po.missings.length > 0">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="category-info">
+                                        Missing Equipment ({{ctrl.po.missings.length}} items)
+                                    </div>
+                                </div>
+
+                                <div ng-repeat="item in ctrl.po.missings track by $index">
+                                    <div class="col-md-12">
+                                        <div class="item-info">
+                                            <div class="item-index"><div>{{$index + 1}}</div></div>
+                                            <div class="item-summary">
+                                                <img class="item-image" src="../images/character.png" />
+                                                <p><b>{{item.productNumber}}</b></p>
+                                            </div>
+                                            <div class="item-details">
+                                                <p><b>Quantity: </b>{{item.qty}}</p>
+                                                <p><b>Original Purchase Amount: </b>{{item.originalAmount | currency:"$":2}}</p>
+                                                <div class="adjust">
+                                                    <b>Purchase Order Adjustment: </b>
+                                                    <span class="value">{{item.affectAmount | currency:"$":2}}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <hr ng-if="$index != ctrl.po.missings.length -1" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb20" ng-if="ctrl.po.extras.length > 0">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="category-info">
+                                        Extra Equipment ({{ctrl.po.extras.length}} items)
+                                    </div>
+                                </div>
+
+                                <div ng-repeat="item in ctrl.po.extras track by $index">
+                                    <div class="col-md-12">
+                                        <div class="item-info">
+                                            <div class="item-index"><div>{{$index + 1}}</div></div>
+                                            <div class="item-summary">
+                                                <img class="item-image" src="../images/character.png" />
+                                                <p><b>{{item.productNumber}}</b></p>
+                                            </div>
+                                            <div class="item-details">
+                                                <p><b>Original Quantity: </b>{{item.originalQty}}</p>
+                                                <p><b>Received Quantity: </b>{{item.receivedQty}}</p>
+                                                <p><b>Quantity Change: </b>{{item.receivedQty - item.originalQty}}</p>
+                                                <div class="adjust">
+                                                    <b>Purchase Order Adjustment: </b>
+                                                    <span class="value">{{item.affectAmount | currency:"$":2}}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <hr ng-if="$index != ctrl.po.extras.length -1" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="action-section">
+                            <div class="form-group">
+                                <input type="text" class="form-control" style="width: 250px" placeholder="Email to"
+                                        name="emailTo"
+                                        ng-model="ctrl.po.emailTo"
+                                        ng-class="{'required-field': poForm.$submitted && (poForm.emailTo.$error.required || poForm.emailTo.$error.email)}"
+                                        required
+                                />
+                            </div>
+                            <button type="button" class="btn btn-primary btn-prev" ng-click="ctrl.goPrev();">Previous</button>
+                            <button class="btn btn-primary btn-next">Submit</button>
+                        </div>
+                    </form>
+                </div>
+                <!-- Begin of Step 7 -->
             </div>
         </div>
     </div>
