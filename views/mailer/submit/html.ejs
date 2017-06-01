@@ -1,119 +1,61 @@
+<html>
+<head>
+    <style type="text/css">
+        body {
+            width: 700px;
+            margin: 0 auto;
+            font-size: 16px !important;
+        }
 
-<div style="margin-top: 50px; width: 100%">
-    <div style="width: 100%">
-        <div style="float: left; width: 40%">
-            <h3 style="margin-bottom: 30px;">PO Info</h3>
-            <div>
-                <p style="color: #222">PO Number: <span style="margin-left: 10px; font-weight: bold;"><%= data.poNumber %></span></p>
-                <p style="color: #222">Receipt Date: <span style="margin-left: 10px; font-weight: bold;"><%= data.receiptDate %></span></p>
-                <p style="color: #222">Original Purchase Price: <span style="margin-left: 10px; font-weight: bold;"><%= data.orgPurchasePrice %></span></p>
-                <p style="color: #222">Received Value: <span style="margin-left: 10px; font-weight: bold;"><%= data.receivedValue %></span></p>
-                <p style="color: #222">Difference: <span style="margin-left: 10px; font-weight: bold;"><%= data.difference %></span></p>
+        div.content {
+            padding-bottom: 20px;
+            font-size: 16px;
+            line-height: 25px;
+        }
+
+        .po-number {
+          font-size: 30px;
+          font-weight: bold;
+          color: #5cb85c;
+          padding-top: 50px;
+          padding-bottom: 30px;
+        }
+
+        .amount {
+            font-size: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div style="width: 700px; margin: 0 auto; padding: 30px;">
+        <div style="width: 100%">
+            <div class="po-number">PO Number: <%= data.poNumber %></div>
+            <div class="content">Hello <%= data.contactName %> (account contact)!</div>
+            <div class="content">
+                We are writing to inform you that there has been a change in value for <b>Purchase Order <%= data.poNumber %>. </b>
+                The changes are summarized as follows:
             </div>
-        </div>
-        <div style="float: left; width: 60%">
-            <h3 style="margin-bottom: 30px;">Receiving Contact Info</h3>
-            <div>
-                <p style="color: #222">Name: <span style="margin-left: 10px; font-weight: bold;"><%= data.name %></span></p>
-                <p style="color: #222">Email: <span style="margin-left: 10px; font-weight: bold;"><%= data.email %></span></p>
-                <p style="color: #222">Phone Number: <span style="margin-left: 10px; font-weight: bold;"><%= data.phoneNumber %></span></p>
+            <div class="content" style="font-size:20px">
+                <i>Original Purchase Order Amount: <%= data.poAmount %></i><br />
+                <span style="color: #5cb85c">New Purchase Order Amount: <%= data.newAmount %></span>
             </div>
+            <div class="content">Details regarding each change are included in the <b style="color: #5cb85c">PDF packet attached to this email</b>.</div>
+            <div class="content">For questions regarding these Purchase Order changes, please contact <a href="mailto:<%= data.email %>"><%= data.name %></a></div>
+            <div class="content">Thank you and have a great day!<br /><%= data.name %></div>
         </div>
-        <div style="clear: both"></div>
+    </dv>
+
+    <div style="width: 700px; margin: 0 auto; padding-top:50px; padding: 30px; background-color: #5cB85c">
+        <div class="content" style="color: white;">
+            <b>Prefer to call us?</b><br />
+            708-479-0062
+        </div>
+        <div class="content">
+            9830 West 190th Street, Suite I<br/>
+            Mokena, IL 60448<br/>
+            <a href="http://wwww.authorizedacquisitions.com" style="color: white">wwww.authorizedacquisitions.com</a>
+        </div>
     </div>
-
-    <hr />
-
-    <% for(var i = 0; i < data.items.length; i ++) { %>
-        <div style="width: 100%;">
-            <div style="width: 100%;">
-                <% if (data.items[i].category == 'Missing') { %>
-                    <h3 style="margin-bottom: 20px">Missing Equipment</h3>
-                    <div class="item-details">
-                        <div style="display: table-cell; vertical-align: top; min-width: 100px; padding-right: 20px;">
-                            <p><b>Product Number</b></p>
-                            <p><%= data.items[i].productNumber %></p>
-                        </div>
-                        <div style="display: table-cell; vertical-align: top; min-width: 100px; padding-right: 20px;">
-                            <p><b>Quantity</b></p>
-                            <p><%= data.items[i].qty %></p>
-                        </div>
-                        <div style="display: table-cell; vertical-align: top; min-width: 100px; padding-right: 20px;">
-                            <p><b>Purchase Price</b></p>
-                            <p><%= data.items[i].purchasePrice %></p>
-                        </div>
-                        <div style="display: table-cell; vertical-align: top; min-width: 100px; padding-right: 20px;">
-                            <p><b>PO Change</b></p>
-                            <p><%= data.items[i].poChange %></p>
-                        </div>
-                    </div>
-                <% } else if (data.items[i].category == 'Cosmetic' || data.items[i].category == 'Broken') { %>
-                    <h3 style="margin-bottom: 20px">Cosmetic Equipment</h3>
-                    <div class="item-details">
-                        <% if (data.items[i].fileName) { %>
-                            <div style="display: table-cell; vertical-align: top; min-width: 100px; padding-right: 20px;">
-                                <img style="max-width: 200px; margin-bottom: 20px;" src="<%= 'https://s3.amazonaws.com/poconciliation/' + data.items[i].fileName %>" />
-                            </div>
-                        <% } %>
-                        <div style="display: table-cell; vertical-align: top; min-width: 100px; padding-right: 20px;">
-                            <p><b>Product Number</b></p>
-                            <p><%= data.items[i].productNumber %></p>
-                        </div>
-                        <div style="display: table-cell; vertical-align: top; min-width: 100px; padding-right: 20px;">
-                            <p><b>Quantity</b></p>
-                            <p><%= data.items[i].qty %></p>
-                        </div>
-                        <div style="display: table-cell; vertical-align: top; min-width: 100px; padding-right: 20px;">
-                            <p><b>Purchase Price</b></p>
-                            <p><%= data.items[i].purchasePrice %></p>
-                        </div>
-                        <div style="display: table-cell; vertical-align: top; min-width: 100px; padding-right: 20px;">
-                            <p><b>Cosmetic Price</b></p>
-                            <p><%= data.items[i].cosmeticPrice %></p>
-                        </div>
-                        <div style="display: table-cell; vertical-align: top; min-width: 100px; padding-right: 20px;">
-                            <p><b>PO Change</b></p>
-                            <p><%= data.items[i].poChange %></p>
-                        </div>
-                    </div>
-                    <div class="item-details">
-                        <div style="display: table-cell; vertical-align: top; min-width: 100px; padding-right: 20px;">
-                            <p><b>Comments</b></p>
-                            <p><%= data.items[i].comment %></p>
-                        </div>
-                    </div>
-                <% } else if (data.items[i].category == 'Extra') { %>
-                    <h3 style="margin-bottom: 20px">Extra Equipment</h3>
-                    <div class="item-details">
-                        <% if (data.items[i].fileName) { %>
-                            <div style="display: table-cell; vertical-align: top; min-width: 100px; padding-right: 20px;">
-                                <img style="max-width: 200px; padding-right: 20px; margin-bottom: 20px;" src="<%= 'https://s3.amazonaws.com/poconciliation/' + data.items[i].fileName %>" />
-                            </div>
-                        <% } %>
-                        <div style="display: table-cell; vertical-align: top; min-width: 100px; padding-right: 20px;">
-                            <p><b>Product Number</b></p>
-                            <p><%= data.items[i].productNumber %></p>
-                        </div>
-                        <div style="display: table-cell; vertical-align: top; min-width: 100px; padding-right: 20px;">
-                            <p><b>Original Quantity</b></p>
-                            <p><%= data.items[i].originalQty %></p>
-                        </div>
-                        <div style="display: table-cell; vertical-align: top; min-width: 100px; padding-right: 20px;">
-                            <p><b>Quantity Received</b></p>
-                            <p><%= data.items[i].receivedQty %></p>
-                        </div>
-                        <div style="display: table-cell; vertical-align: top; min-width: 100px; padding-right: 20px;">
-                            <p><b>Quantity Change</b></p>
-                            <p><%= data.items[i].receivedQty - data.items[i].originalQty %></p>
-                        </div>
-                        <div style="display: table-cell; vertical-align: top; min-width: 100px; padding-right: 20px;">
-                            <p><b>Purchase Price</b></p>
-                            <p><%= data.items[i].purchasePrice %></p>
-                        </div>
-                    </div>
-                <% } %>
-                <hr />
-            </div>
-        </div>
-    <% } %>
-</dv>
+</body>
+</html>

@@ -18,6 +18,7 @@ exports.sendOne = function (templateName, locals, fn) {
   if (!locals.subject) {
     return fn(EmailAddressRequiredError);
   }
+
   emailTemplates(templatesDir, function (err, template) {
     if (err) {
       return fn(err);

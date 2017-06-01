@@ -184,6 +184,7 @@
                                     ng-model="item.qty"
                                     min="1"
                                     ng-class="{'required-field': poForm.$submitted && (poForm['qty' + $index].$error.required || !poForm['qty' + $index].$valid)}"
+                                    ng-change="ctrl.changeCosmeticAmount(item);"
                                     required
                                 />
                             </div>
@@ -196,6 +197,7 @@
                                     name="{{'originalAmount' + $index}}"
                                     ng-model="item.originalAmount"
                                     ng-class="{'required-field': poForm.$submitted && (poForm['originalAmount' + $index].$error.required || !poForm['originalAmount' + $index].$valid)}"
+                                    ng-change="ctrl.changeCosmeticAmount(item);"
                                     required
                                 />
                             </div>
@@ -208,6 +210,7 @@
                                     name="{{'cosmeticAmount' + $index}}"
                                     ng-model="item.cosmeticAmount"
                                     ng-class="{'required-field': poForm.$submitted && (poForm['cosmeticAmount' + $index].$error.required || !poForm['cosmeticAmount' + $index].$valid)}"
+                                    ng-change="ctrl.changeCosmeticAmount(item);"
                                     required
                                 />
                             </div>
@@ -232,6 +235,7 @@
                                     name="{{'newAmount' + $index}}"
                                     ng-model="item.newAmount"
                                     ng-class="{'required-field': poForm.$submitted && (poForm['newAmount' + $index].$error.required || !poForm['newAmount' + $index].$valid)}"
+                                    ng-change="ctrl.changeCosmeticNewAmount(item)"
                                     required
                                 />
                             </div>
@@ -310,6 +314,7 @@
                                     ng-model="item.qty"
                                     min="1"
                                     ng-class="{'required-field': poForm.$submitted && (poForm['qty' + $index].$error.required || !poForm['qty' + $index].$valid)}"
+                                    ng-change="ctrl.changeBrokenAmount(item);"
                                     required
                                 />
                             </div>
@@ -322,6 +327,7 @@
                                     name="{{'originalAmount' + $index}}"
                                     ng-model="item.originalAmount"
                                     ng-class="{'required-field': poForm.$submitted && (poForm['originalAmount' + $index].$error.required || !poForm['originalAmount' + $index].$valid)}"
+                                    ng-change="ctrl.changeBrokenAmount(item);"
                                     required
                                 />
                             </div>
@@ -334,6 +340,7 @@
                                     name="{{'brokenAmount' + $index}}"
                                     ng-model="item.brokenAmount"
                                     ng-class="{'required-field': poForm.$submitted && (poForm['brokenAmount' + $index].$error.required || !poForm['brokenAmount' + $index].$valid)}"
+                                    ng-change="ctrl.changeBrokenAmount(item);"
                                     required
                                 />
                             </div>
@@ -358,6 +365,7 @@
                                     name="{{'newAmount' + $index}}"
                                     ng-model="item.newAmount"
                                     ng-class="{'required-field': poForm.$submitted && (poForm['newAmount' + $index].$error.required || !poForm['newAmount' + $index].$valid)}"
+                                    ng-change="ctrl.changeBrokenNewAmount(item);"
                                     required
                                 />
                             </div>
@@ -436,6 +444,7 @@
                                     ng-model="item.qty"
                                     min="1"
                                     ng-class="{'required-field': poForm.$submitted && (poForm['qty' + $index].$error.required || !poForm['qty' + $index].$valid)}"
+                                    ng-change="ctrl.changeMissingAmount(item)"
                                     required
                                 />
                             </div>
@@ -448,18 +457,7 @@
                                     name="{{'originalAmount' + $index}}"
                                     ng-model="item.originalAmount"
                                     ng-class="{'required-field': poForm.$submitted && (poForm['originalAmount' + $index].$error.required || !poForm['originalAmount' + $index].$valid)}"
-                                    required
-                                />
-                            </div>
-
-                            <div class="form-group">
-                                <label>Missing Purchase Amount</label>
-                                <input
-                                    type="number"
-                                    class="form-control"
-                                    name="{{'missingAmount' + $index}}"
-                                    ng-model="item.missingAmount"
-                                    ng-class="{'required-field': poForm.$submitted && (poForm['missingAmount' + $index].$error.required || !poForm['missingAmount' + $index].$valid)}"
+                                    ng-change="ctrl.changeMissingAmount(item)"
                                     required
                                 />
                             </div>
@@ -540,6 +538,7 @@
                                     ng-model="item.originalQty"
                                     min="1"
                                     ng-class="{'required-field': poForm.$submitted && (poForm['originalQty' + $index].$error.required || !poForm['originalQty' + $index].$valid)}"
+                                    ng-change="ctrl.changeExtraAmount(item)"
                                     required
                                 />
                             </div>
@@ -553,6 +552,21 @@
                                     ng-model="item.receivedQty"
                                     min="1"
                                     ng-class="{'required-field': poForm.$submitted && (poForm['receivedQty' + $index].$error.required || !poForm['receivedQty' + $index].$valid)}"
+                                    ng-change="ctrl.changeExtraAmount(item)"
+                                    required
+                                />
+                            </div>
+
+                            <div class="form-group">
+                                <label>Purchase Amount</label>
+                                <input
+                                    type="number"
+                                    class="form-control"
+                                    name="{{'purchaseAmount' + $index}}"
+                                    ng-model="item.purchaseAmount"
+                                    min="1"
+                                    ng-class="{'required-field': poForm.$submitted && (poForm['purchaseAmount' + $index].$error.required || !poForm['purchaseAmount' + $index].$valid)}"
+                                    ng-change="ctrl.changeExtraAmount(item)"
                                     required
                                 />
                             </div>
@@ -570,7 +584,7 @@
                             </div>
 
                             <div class="form-group">
-                                <label>Add more Missing Items</label>
+                                <label>Add more Extra Items</label>
                                 <div class="radio">
                                     <label>
                                         <input type="radio" name="{{'moreExtra' + $index}}" value="yes" ng-model="item.moreExtra" ng-change="ctrl.addExtra($index, item)" required />
@@ -612,7 +626,7 @@
                                 <div class="checker-section">
                                     <p><b>Checked In By:</b></p>
                                     <div>
-                                        <img class="checker-photo" src="../images/character.png" />
+                                        <img class="checker-photo" ng-src="{{ctrl.po.checker.photo}}" />
                                         <div class="checker-info">
                                             {{ctrl.po.checker.name}} <br />
                                             <a href="mailto:{{ctrl.po.checker.email}}">{{ctrl.po.checker.email}}</a> <br />

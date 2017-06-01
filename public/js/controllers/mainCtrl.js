@@ -9,7 +9,7 @@ MainCtrl.$inject = ['$http', '$state', '$filter', 'Upload'];
 function MainCtrl($http, $state, $filter, Upload) {
   var ctrl = this;
 
-  ctrl.po = {}; // Total PO Conciliation object
+  ctrl.po; // Total PO Conciliation object
   ctrl.dateFormat = 'MM/dd/yyyy'; // Date format for Angular UI Bootstrap
   ctrl.dateOptions = { // Date option used for date picker
     maxDate: new Date(2050, 12, 31),
@@ -35,11 +35,12 @@ function MainCtrl($http, $state, $filter, Upload) {
     'Summary of PO Change'
   ];
 
+  ctrl.logo = 'https://s3.amazonaws.com/authorized-acquisition-assets/small_logo.png';
   ctrl.checkers = [
-    { name: 'Mike Kobalski', email: 'tom@aamedicalstore.com', phone: '708-479-0062'},
-    { name: 'Cort Ulas', email: 'mike@aamedicalstore.com', phone: '708-479-0062' },
-    { name: 'Tommy Caveny', email: 'jeremy@aamedicalstore.com', phone: '708-479-0062' },
-    { name: 'Jeremy Vestal', email: 'cort@aamedicalstore.com', phone: '708-479-0062' }
+    { name: 'Mike Kobalski', email: 'tom@aamedicalstore.com', phone: '708-479-0062', photo: 'https://s3.amazonaws.com/authorized-acquisition-assets/mike.png' },
+    { name: 'Cort Ulas', email: 'mike@aamedicalstore.com', phone: '708-479-0062', photo: 'https://s3.amazonaws.com/authorized-acquisition-assets/cortUlas.jpg' },
+    { name: 'Tommy Caveny', email: 'jeremy@aamedicalstore.com', phone: '708-479-0062', photo: 'https://s3.amazonaws.com/authorized-acquisition-assets/tom.png' },
+    { name: 'Jeremy Vestal', email: 'cort@aamedicalstore.com', phone: '708-479-0062', photo: 'https://s3.amazonaws.com/authorized-acquisition-assets/jeremy_V.png' }
   ];
 
   // AWS Configuration
@@ -63,6 +64,17 @@ function MainCtrl($http, $state, $filter, Upload) {
     }
 
     ctrl.step ++;
+    if (ctrl.step == 6) {
+      // Calculate total new amount
+      var items = [];
+      angular.extend(items, ctrl.cosmetics, ctrl.brokens, ctrl.missings, ctrl.extras);
+
+      ctrl.po.newAmount = 0;
+      for (var i = 0; i < items.length; i++) {
+        ctrl.po.newAmount += parseFloat(items[i].affectAmount);
+      }
+      ctrl.po.difference = parseFloat(ctrl.po.poAmount) - ctrl.po.newAmount;
+    }
   }
 
   // Go to previous step
@@ -85,6 +97,7 @@ function MainCtrl($http, $state, $filter, Upload) {
     if (item.moreCosmetic == 'yes') {
       var newItem = new Object();
       newItem.category = 'Cosmetic';
+      item.moreCosmetic = 'no';
       ctrl.po.cosmetics.push(newItem);
     } else {
       ctrl.po.cosmetics.splice(index + 1, 1);
@@ -106,6 +119,7 @@ function MainCtrl($http, $state, $filter, Upload) {
     if (item.moreBroken == 'yes') {
       var newItem = new Object();
       newItem.category = 'Broken';
+      item.moreBroken = 'no';
       ctrl.po.brokens.push(newItem);
     } else {
       ctrl.po.brokens.splice(index + 1, 1);
@@ -127,6 +141,7 @@ function MainCtrl($http, $state, $filter, Upload) {
     if (item.moreMissing == 'yes') {
       var newItem = new Object();
       newItem.category = 'Missing';
+      item.moreMissing = 'no';
       ctrl.po.missings.push(newItem);
     } else {
       ctrl.po.missings.splice(index + 1, 1);
@@ -148,26 +163,61 @@ function MainCtrl($http, $state, $filter, Upload) {
     if (item.moreExtra == 'yes') {
       var newItem = new Object();
       newItem.category = 'Extra';
+      item.moreExtra = 'no';
       ctrl.po.extras.push(newItem);
     } else {
       ctrl.po.extras.splice(index + 1, 1);
     }
   }
 
-  // Get items list by category
-  ctrl.getItems = function(category) {
-    if (category) {
-      var list = [];
-      for (var i = 0; i < ctrl.po.items.length; i++) {
-        if (ctrl.po.items[i].category == category) {
-          list.push(ctrl.po.items[i]);
-        }
-      }
+  ctrl.changeCosmeticAmount = function(item) {
+    var qty = parseInt(item.qty) || 0,
+        originalAmount = parseFloat(item.originalAmount) || 0,
+        cosmeticAmount = parseFloat(item.cosmeticAmount) || 0;
 
-      return list;
-    } else {
-      return ctrl.po.items;
-    }
+    item.newAmount = qty * cosmeticAmount;
+    item.affectAmount = (originalAmount * qty - item.newAmount) * -1;
+    ctrl.po.newAmount =
+  }
+
+  ctrl.changeCosmeticNewAmount = function(item) {
+    var qty = parseInt(item.qty) || 0,
+        originalAmount = parseFloat(item.originalAmount) || 0,
+        newAmount = parseFloat(item.newAmount) || 0;
+
+    item.affectAmount = (originalAmount * qty - item.newAmount) * -1;
+  }
+
+  ctrl.changeBrokenAmount = function(item) {
+    var qty = parseInt(item.qty) || 0,
+        originalAmount = parseFloat(item.originalAmount) || 0,
+        brokenAmount = parseFloat(item.brokenAmount) || 0;
+
+    item.newAmount = qty * brokenAmount;
+    item.affectAmount = (originalAmount * qty - item.newAmount) * -1;
+  }
+
+  ctrl.changeBrokenNewAmount = function(item) {
+    var qty = parseInt(item.qty) || 0,
+        originalAmount = parseFloat(item.originalAmount) || 0,
+        newAmount = parseFloat(item.newAmount) || 0;
+
+    item.affectAmount = (originalAmount * qty - item.newAmount) * -1;
+  }
+
+  ctrl.changeMissingAmount = function(item) {
+    var qty = parseInt(item.qty) || 0,
+        originalAmount = parseFloat(item.originalAmount) || 0;
+
+    item.affectAmount = (qty * originalAmount) * -1;
+  }
+
+  ctrl.changeExtraAmount = function(item) {
+    var originalQty = parseInt(item.originalQty) || 0,
+        receivedQty = parseInt(item.receivedQty) || 0,
+        purchaseAmount = parseFloat(item.purchaseAmount) || 0;
+
+    item.affectAmount = (receivedQty - originalQty) * purchaseAmount;
   }
 
   // Submit total data
@@ -232,12 +282,11 @@ function MainCtrl($http, $state, $filter, Upload) {
         checkerPhone: ctrl.po.checker.phone,
         emailTo: ctrl.po.emailTo,
         poNumber: ctrl.po.poNumber,
-        poAmount: ctrl.po.poAmount,
         receiptDate: $filter('date')(ctrl.po.receiptDate, 'MM/dd/yyyy'),
         accountName: ctrl.po.accountName,
         contactName: ctrl.po.contactName,
-        orgPurchasePrice: $filter('currency')(ctrl.po.orgPurchasePrice, '$', 2),
-        receivedValue: $filter('currency')(ctrl.po.receivedValue, '$', 2),
+        poAmount: $filter('currency')(ctrl.po.poAmount, '$', 2),
+        newAmount: $filter('currency')(ctrl.po.poAmount, '$', 2),
         difference: $filter('currency')(ctrl.po.difference, '$', 2),
         items: JSON.stringify(items),
       }
@@ -253,10 +302,12 @@ function MainCtrl($http, $state, $filter, Upload) {
     ctrl.hasBroken = 'no';
     ctrl.hasMissing = 'no';
     ctrl.hasExtra = 'no';
+    ctrl.po = {};
     ctrl.po.cosmetics = [];
     ctrl.po.brokens = [];
     ctrl.po.missings = [];
     ctrl.po.extras = [];
+    ctrl.po.items = [];
   }
 
   init();

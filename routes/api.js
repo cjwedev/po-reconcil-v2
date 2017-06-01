@@ -10,19 +10,22 @@ exports.send = function(req, res) {
   console.log(req.body);
   var params = {};
   params.poNumber = req.body.poNumber;
-  params.orgPurchasePrice = req.body.orgPurchasePrice;
+  params.name = req.body.checkerName;
+  params.email = req.body.checkerEmail;
+  params.phoneNumber = req.body.checkerPhone;
+  params.contactName = req.body.contactName;
+  params.accountName = req.body.accountName;
+  params.poAmount = req.body.poAmount;
+  params.newAmount = req.body.newAmount;
+  params.difference = req.body.difference;
   params.receiptDate = req.body.receiptDate;
   params.receivedValue = req.body.receivedValue;
-  params.difference = req.body.difference;
-  params.name = req.body.name;
-  params.email = req.body.email;
-  params.phoneNumber = req.body.phoneNumber;
   params.items = JSON.parse(req.body.items);
 
   var mailData = {
-    from: req.body.email,
+    from: req.body.checkerEmail,
     to: req.body.emailTo,
-    subject: 'PO Conciliation',
+    subject: 'PO Reconciliation',
     data: params
   };
   mailer.sendOne('submit', mailData, (error, info) => {
