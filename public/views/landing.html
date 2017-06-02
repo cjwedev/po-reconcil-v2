@@ -613,7 +613,7 @@
                     <form name="poForm" role="form" ng-submit="ctrl.submit(poForm);" novalidate>
                         <div class="row summary-info mb20">
                             <div class="col-md-6">
-                                <img class="logo" src="../images/character.png" />
+                                <img ng-src="{{ctrl.logo}}" />
                                 <p class="po-number">PO Number: {{ctrl.po.poNumber}}</p>
                                 <div>
                                     <p><b>Receipt Date: </b>{{ctrl.po.receiptDate | date}}</p>
@@ -653,7 +653,8 @@
                         <div class="mb20" ng-if="ctrl.po.cosmetics.length > 0">
                             <div class="row">
                                 <div class="col-md-12">
-                                    <div class="category-info">Cosmetic Equipment ({{ctrl.po.cosmetics.length}} items)</div>
+                                    <div class="category-info" ng-if="ctrl.po.cosmetics.length > 1">Cosmetic Equipment ({{ctrl.po.cosmetics.length}} items)</div>
+                                    <div class="category-info" ng-if="ctrl.po.cosmetics.length == 1">Cosmetic Equipment (1 item)</div>
                                 </div>
 
                                 <div ng-repeat="item in ctrl.po.cosmetics track by $index">
@@ -661,9 +662,9 @@
                                         <div class="item-info">
                                             <div class="item-index"><div>{{$index + 1}}</div></div>
                                             <div class="item-summary">
-                                                <img class="item-image" src="../images/character.png" />
+                                                <img class="item-image" ngf-src="item.file" />
                                                 <p><b>{{item.productNumber}}</b></p>
-                                                <p>
+                                                <p ng-if="item.comment">
                                                     <b>Comments:</b><br />
                                                     <i>{{item.comment}}</i>
                                                 </p>
@@ -678,9 +679,8 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        <hr ng-if="$index != ctrl.po.cosmetics.length -1" />
                                     </div>
-
-                                    <hr ng-if="$index != ctrl.po.cosmetics.length -1" />
                                 </div>
                             </div>
                         </div>
@@ -688,8 +688,11 @@
                         <div class="mb20" ng-if="ctrl.po.brokens.length > 0">
                             <div class="row">
                                 <div class="col-md-12">
-                                    <div class="category-info">
+                                    <div class="category-info" ng-if="ctrl.po.brokens.length > 1">
                                         Broken Equipment ({{ctrl.po.brokens.length}} items)
+                                    </div>
+                                    <div class="category-info" ng-if="ctrl.po.brokens.length == 1">
+                                        Broken Equipment (1 item)
                                     </div>
                                 </div>
 
@@ -698,9 +701,9 @@
                                         <div class="item-info">
                                             <div class="item-index"><div>{{$index + 1}}</div></div>
                                             <div class="item-summary">
-                                                <img class="item-image" src="../images/character.png" />
+                                                <img class="item-image" ngf-src="item.file" />
                                                 <p><b>{{item.productNumber}}</b></p>
-                                                <p>
+                                                <p ng-if="item.comment">
                                                     <b>Comments:</b><br />
                                                     <i>{{item.comment}}</i>
                                                 </p>
@@ -708,16 +711,15 @@
                                             <div class="item-details">
                                                 <p><b>Quantity: </b>{{item.qty}}</p>
                                                 <p><b>Original Purchase Amount: </b>{{item.originalAmount | currency:"$":2}}</p>
-                                                <p><b>Cosmetic Purchase Amount: </b>{{item.brokenAmount | currency:"$":2}}</p>
+                                                <p><b>Broken Purchase Amount: </b>{{item.brokenAmount | currency:"$":2}}</p>
                                                 <div class="adjust">
                                                     <b>Purchase Order Adjustment: </b>
                                                     <span class="value">{{item.affectAmount | currency:"$":2}}</span>
                                                 </div>
                                             </div>
                                         </div>
+                                        <hr ng-if="$index != ctrl.po.brokens.length -1" />
                                     </div>
-
-                                    <hr ng-if="$index != ctrl.po.brokens.length -1" />
                                 </div>
                             </div>
                         </div>
@@ -725,8 +727,11 @@
                         <div class="mb20" ng-if="ctrl.po.missings.length > 0">
                             <div class="row">
                                 <div class="col-md-12">
-                                    <div class="category-info">
+                                    <div class="category-info" ng-if="ctrl.po.missings.length > 1">
                                         Missing Equipment ({{ctrl.po.missings.length}} items)
+                                    </div>
+                                    <div class="category-info" ng-if="ctrl.po.missings.length == 1">
+                                        Missing Equipment (1 item)
                                     </div>
                                 </div>
 
@@ -735,7 +740,6 @@
                                         <div class="item-info">
                                             <div class="item-index"><div>{{$index + 1}}</div></div>
                                             <div class="item-summary">
-                                                <img class="item-image" src="../images/character.png" />
                                                 <p><b>{{item.productNumber}}</b></p>
                                             </div>
                                             <div class="item-details">
@@ -747,9 +751,8 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        <hr ng-if="$index != ctrl.po.missings.length -1" />
                                     </div>
-
-                                    <hr ng-if="$index != ctrl.po.missings.length -1" />
                                 </div>
                             </div>
                         </div>
@@ -757,8 +760,11 @@
                         <div class="mb20" ng-if="ctrl.po.extras.length > 0">
                             <div class="row">
                                 <div class="col-md-12">
-                                    <div class="category-info">
+                                    <div class="category-info" ng-if="ctrl.po.extras.length > 1">
                                         Extra Equipment ({{ctrl.po.extras.length}} items)
+                                    </div>
+                                    <div class="category-info" ng-if="ctrl.po.extras.length == 1">
+                                        Extra Equipment (1 item)
                                     </div>
                                 </div>
 
@@ -767,7 +773,6 @@
                                         <div class="item-info">
                                             <div class="item-index"><div>{{$index + 1}}</div></div>
                                             <div class="item-summary">
-                                                <img class="item-image" src="../images/character.png" />
                                                 <p><b>{{item.productNumber}}</b></p>
                                             </div>
                                             <div class="item-details">
@@ -780,9 +785,9 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
 
-                                    <hr ng-if="$index != ctrl.po.extras.length -1" />
+                                        <hr ng-if="$index != ctrl.po.extras.length -1" />
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -796,8 +801,8 @@
                                         required
                                 />
                             </div>
-                            <button type="button" class="btn btn-primary btn-prev" ng-click="ctrl.goPrev();">Previous</button>
-                            <button class="btn btn-primary btn-next">Submit</button>
+                            <button type="button" class="btn btn-primary btn-prev" ng-disabled="ctrl.isSending" ng-click="ctrl.goPrev();">Previous</button>
+                            <button class="btn btn-primary btn-next" ng-disabled="ctrl.isSending">Submit</button>
                         </div>
                     </form>
                 </div>

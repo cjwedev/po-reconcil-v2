@@ -1,0 +1,359 @@
+<html>
+<head>
+    <style type="text/css">
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+            font-size: 14px;
+            line-height: 1.42857143;
+            color: #333;
+        }
+
+        img {
+            vertical-align: middle;
+        }
+
+        p {
+            margin: 0 0 10px;
+        }
+
+        a {
+            color: #337ab7;
+            text-decoration: none;
+        }
+
+        hr {
+            border-top: 1px dashed #ccc;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            border: 0;
+            border-top: 1px dashed #ccc;
+        }
+
+        :before,
+        :after {
+            box-sizing: border-box;
+        }
+
+        .container {
+            padding-right: 15px;
+            padding-left: 15px;
+            margin-right: auto;
+            margin-left: auto;
+            width: 760px;
+            padding: 50px 0px;
+        }
+
+        .container::before,
+        .container::after {
+            display: table;
+            content: " ";
+        }
+
+        .row {
+            margin-right: -15px;
+            margin-left: -15px;
+        }
+
+        .row::before,
+        .row::after {
+            display: table;
+            content: " ";
+            clear: both;
+        }
+
+        .col-md-12 {
+            width: 100%;
+            float: left;
+            position: relative;
+            min-height: 1px;
+            padding-right: 15px;
+            padding-left: 15px;
+        }
+
+        .col-md-6 {
+            width: 50%;
+            float: left;
+            position: relative;
+            min-height: 1px;
+            padding-right: 15px;
+            padding-left: 15px;
+        }
+
+        .mb20 {
+            margin-bottom: 20px;
+        }
+
+        .summary-info {
+            font-size: 16px;
+        }
+
+        .po-number {
+            margin: 30px 0px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #5cb85c;
+        }
+
+        .checker-section {
+            background-color: #ddd;
+            padding: 15px;
+        }
+
+        .checker-photo {
+            width: 100px;
+            display: inline-block;
+            margin-right: 5px;
+        }
+
+        .checker-info {
+            display: inline-block;
+            line-height: 25px;
+            vertical-align: top;
+        }
+
+        .original-amount {
+            display: inline-block;
+            float: left;
+            width: 50%;
+            text-align: center;
+            background-color: #337ab7;
+            color: white;
+            font-weight: bold;
+            padding: 15px 0px;
+            font-size: 18px;
+        }
+
+        .new-amount {
+            display: inline-block;
+            width: 50%;
+            text-align: center;
+            background-color: #5cb85c;
+            color: white;
+            font-weight: bold;
+            padding: 15px 0px;
+            font-size: 18px;
+        }
+
+        .difference {
+            text-align: right;
+            margin: 10px 0px;
+            font-style: italic;
+        }
+
+        .category-info {
+            background-color: #ddd;
+            padding: 15px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .item-info {
+            display: table;
+            width: 100%;
+        }
+
+        .item-index {
+            display: table-cell;
+            vertical-align: top;
+            text-align: center;
+            width: 40px;
+        }
+
+        .item-index div {
+            background-color: #ddd;
+            width: 40px;
+            height: 40px;
+            line-height: 40px;
+        }
+
+        .item-summary {
+            display: table-cell;
+            vertical-align: top;
+            width: 50%;
+            padding-left: 10px;
+        }
+
+        .item-image {
+            height: 150px;
+            margin-bottom: 5px;
+            border: 1px solid #5cb85c;
+        }
+
+        .item-details {
+            display: table-cell;
+            vertical-align: top;
+            text-align: right;
+        }
+
+        .item-details p {
+            padding-right: 15px;
+        }
+
+        .adjust {
+            padding: 10px 15px 10px 0px;
+            padding-bottom: 10px;
+            background-color: #ddd;
+        }
+
+        .adjust .value {
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+    
+    <div class="container">
+        <div class="row summary-info mb20">
+            <div class="col-md-6">
+                <img src="https://s3.amazonaws.com/authorized-acquisition-assets/small_logo.png" />
+                <p class="po-number">PO Number: 123123</p>
+                <div>
+                    <p><b>Receipt Date: </b>Jun 14, 2017</p>
+                    <p><b>Account Name: </b>123123</p>
+                    <p><b>Contact Name: </b>123123</p>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="checker-section">
+                    <p><b>Checked In By:</b></p>
+                    <div>
+                        <img class="checker-photo" src="https://s3.amazonaws.com/authorized-acquisition-assets/mike.png" />
+                        <div class="checker-info">
+                            Mike Kobalski <br />
+                            <a href="mailto:tom@aamedicalstore.com">tom@aamedicalstore.com</a> <br />
+                            708-479-0062 <br />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="original-amount">
+                    Original PO Amount: $123,123.00
+                </div>
+                <div class="new-amount">
+                    New PO Amount: $12,054.00
+                </div>
+            </div>
+        </div>
+
+        <p class="difference">Difference: $111,069.00</p>
+
+        
+            <div class="mb20">
+                <div class="row">
+                    <div class="col-md-12">
+                        
+                            <div class="category-info">Cosmetic Equipment (1 item)</div>
+                        
+                    </div>
+
+                    
+                        <div class="col-md-12">
+                            <div class="item-info">
+                                <div class="item-index"><div>1</div></div>
+                                <div class="item-summary">
+                                    
+                                        <img class="item-image" src="https://s3.amazonaws.com/poconciliation/123123-download.jpg" />
+                                    
+                                    <p><b>123123</b></p>
+                                    
+                                        <p ng-if="item.comment">
+                                            <b>Comments:</b><br />
+                                            <i>12 3123 123 123123123 123 12 312 312 312 312 3</i>
+                                        </p>
+                                    
+                                </div>
+                                <div class="item-details">
+                                    <p><b>Quantity: </b>23</p>
+                                    <p><b>Original Purchase Amount: </b>$14.00</p>
+                                    <p><b>Cosmetic Purchase Amount: </b>$23.00</p>
+                                    <div class="adjust">
+                                        <b>Purchase Order Adjustment: </b>
+                                        <span class="value">$207.00</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    
+                </div>
+            </div>
+        
+
+        
+            <div class="mb20">
+                <div class="row">
+                    <div class="col-md-12">
+                        
+                            <div class="category-info">Broken Equipment (2 items)</div>
+                        
+                    </div>
+
+                    
+                        <div class="col-md-12">
+                            <div class="item-info">
+                                <div class="item-index"><div>1</div></div>
+                                <div class="item-summary">
+                                    
+                                        <img class="item-image" src="https://s3.amazonaws.com/poconciliation/12312-images.jpg" />
+                                    
+                                    <p><b>12312</b></p>
+                                    
+                                </div>
+                                <div class="item-details">
+                                    <p><b>Quantity: </b>123</p>
+                                    <p><b>Original Purchase Amount: </b>$23.00</p>
+                                    <p><b>Broken Purchase Amount: </b>$123.00</p>
+                                    <div class="adjust">
+                                        <b>Purchase Order Adjustment: </b>
+                                        <span class="value">$12,300.00</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                                <hr />
+                            
+                        </div>
+                    
+                        <div class="col-md-12">
+                            <div class="item-info">
+                                <div class="item-index"><div>2</div></div>
+                                <div class="item-summary">
+                                    
+                                    <p><b>123</b></p>
+                                    
+                                </div>
+                                <div class="item-details">
+                                    <p><b>Quantity: </b>123</p>
+                                    <p><b>Original Purchase Amount: </b>$23.00</p>
+                                    <p><b>Broken Purchase Amount: </b>$21.00</p>
+                                    <div class="adjust">
+                                        <b>Purchase Order Adjustment: </b>
+                                        <span class="value">-$246.00</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    
+                </div>
+            </div>
+        
+
+        
+
+        
+    </div>
+</body>
+</html>

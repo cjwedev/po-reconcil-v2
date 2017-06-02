@@ -45,7 +45,7 @@ function MainCtrl($http, $state, $filter, Upload) {
 
   // AWS Configuration
   AWS.config.region = 'us-east-1';
-  AWS.config.update({ accessKeyId: 'AKIAIIRPPBXJ5NF2VCBA', secretAccessKey: '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' });
+  AWS.config.update({ accessKeyId: 'AKIAIVYUK3YUAUTPJ6MQ', secretAccessKey: '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' });
 
   // Closing Alert
   ctrl.closeAlert = function() {
@@ -67,7 +67,7 @@ function MainCtrl($http, $state, $filter, Upload) {
     if (ctrl.step == 6) {
       // Calculate total new amount
       var items = [];
-      angular.extend(items, ctrl.cosmetics, ctrl.brokens, ctrl.missings, ctrl.extras);
+      angular.extend(items, ctrl.po.cosmetics, ctrl.po.brokens, ctrl.po.missings, ctrl.po.extras);
 
       ctrl.po.newAmount = 0;
       for (var i = 0; i < items.length; i++) {
@@ -97,7 +97,7 @@ function MainCtrl($http, $state, $filter, Upload) {
     if (item.moreCosmetic == 'yes') {
       var newItem = new Object();
       newItem.category = 'Cosmetic';
-      item.moreCosmetic = 'no';
+      newItem.moreCosmetic = 'no';
       ctrl.po.cosmetics.push(newItem);
     } else {
       ctrl.po.cosmetics.splice(index + 1, 1);
@@ -119,7 +119,7 @@ function MainCtrl($http, $state, $filter, Upload) {
     if (item.moreBroken == 'yes') {
       var newItem = new Object();
       newItem.category = 'Broken';
-      item.moreBroken = 'no';
+      newItem.moreBroken = 'no';
       ctrl.po.brokens.push(newItem);
     } else {
       ctrl.po.brokens.splice(index + 1, 1);
@@ -141,7 +141,7 @@ function MainCtrl($http, $state, $filter, Upload) {
     if (item.moreMissing == 'yes') {
       var newItem = new Object();
       newItem.category = 'Missing';
-      item.moreMissing = 'no';
+      newItem.moreMissing = 'no';
       ctrl.po.missings.push(newItem);
     } else {
       ctrl.po.missings.splice(index + 1, 1);
@@ -163,7 +163,7 @@ function MainCtrl($http, $state, $filter, Upload) {
     if (item.moreExtra == 'yes') {
       var newItem = new Object();
       newItem.category = 'Extra';
-      item.moreExtra = 'no';
+      newItem.moreExtra = 'no';
       ctrl.po.extras.push(newItem);
     } else {
       ctrl.po.extras.splice(index + 1, 1);
@@ -177,7 +177,6 @@ function MainCtrl($http, $state, $filter, Upload) {
 
     item.newAmount = qty * cosmeticAmount;
     item.affectAmount = (originalAmount * qty - item.newAmount) * -1;
-    ctrl.po.newAmount =
   }
 
   ctrl.changeCosmeticNewAmount = function(item) {
@@ -227,23 +226,38 @@ function MainCtrl($http, $state, $filter, Upload) {
     }
 
     // Upload files
-    var bucket = new AWS.S3({ params: { Bucket: 'poconciliation', maxRetries: 1 }, httpOptions: { timeout: 360000 } });
+    var bucket = new AWS.S3({ params: { Bucket: 'po-reconciliation', maxRetries: 1 }, httpOptions: { timeout: 360000 } });
     var options = {
       partSize: 10 * 1024 * 1024,
       queueSize: 1,
       ACL: 'bucket-owner-full-control'
     };
 
-    var items = [];
-    angular.extend(items, ctrl.cosmetics, ctrl.brokens, ctrl.missings, ctrl.extras);
+    ctrl.isSending = true;
+
+    // Generate file name
     var filesCount = 0, uploadedCount = 0;
+    for (var i = 0; i < ctrl.po.cosmetics.length; i++) {
+      if (ctrl.po.cosmetics[i].file) {
+        filesCount ++;
+        ctrl.po.cosmetics[i].fileName = ctrl.po.cosmetics[i].productNumber + '-' + (new Date().getTime()) + '-' + ctrl.po.cosmetics[i].file.name;
+      }
+    }
+
+    for (var i = 0; i < ctrl.po.brokens.length; i++) {
+      if (ctrl.po.brokens[i].file) {
+        filesCount ++;
+        ctrl.po.brokens[i].fileName = ctrl.po.brokens[i].productNumber + '-' + (new Date().getTime()) + '-' + ctrl.po.brokens[i].file.name;
+      }
+    }
+
+    var items = [];
+    angular.extend(items, ctrl.po.cosmetics, ctrl.po.brokens, ctrl.po.missings, ctrl.po.extras);
     for (var i = 0; i < items.length; i++) {
       var file = items[i].file;
       if (file) {
-        filesCount ++;
-        items[i].fileName = items[i].productNumber + '-' + file.name;
         var params = {
-          Bucket: 'poconciliation',
+          Bucket: 'po-reconciliation',
           Key: items[i].fileName,
           ContentType: file.type,
           Body: file
@@ -253,13 +267,13 @@ function MainCtrl($http, $state, $filter, Upload) {
           uploadedCount ++;
 
           if (uploadedCount == filesCount) { // All files were uploaded
-            postParams();
+            postParams(items);
           }
         });
       }
     }
 
-    if (uploadedCount == 0) {
+    if (filesCount == 0) {
       postParams(items);
     }
   }
@@ -280,18 +294,24 @@ function MainCtrl($http, $state, $filter, Upload) {
         checkerName: ctrl.po.checker.name,
         checkerEmail: ctrl.po.checker.email,
         checkerPhone: ctrl.po.checker.phone,
+        checkerPhoto: ctrl.po.checker.photo,
         emailTo: ctrl.po.emailTo,
         poNumber: ctrl.po.poNumber,
-        receiptDate: $filter('date')(ctrl.po.receiptDate, 'MM/dd/yyyy'),
+        receiptDate: $filter('date')(ctrl.po.receiptDate),
         accountName: ctrl.po.accountName,
         contactName: ctrl.po.contactName,
         poAmount: $filter('currency')(ctrl.po.poAmount, '$', 2),
-        newAmount: $filter('currency')(ctrl.po.poAmount, '$', 2),
+        newAmount: $filter('currency')(ctrl.po.newAmount, '$', 2),
         difference: $filter('currency')(ctrl.po.difference, '$', 2),
-        items: JSON.stringify(items),
+        cosmetics: JSON.stringify(ctrl.po.cosmetics),
+        brokens: JSON.stringify(ctrl.po.brokens),
+        missings: JSON.stringify(ctrl.po.missings),
+        extras: JSON.stringify(ctrl.po.extras),
       }
     }).then(function(response) {
+      ctrl.isSending = false;
     }, function(error) {
+      ctrl.isSending = false;
       ctrl.error = 'Failed to send email. Please try again.';
     });
   }
